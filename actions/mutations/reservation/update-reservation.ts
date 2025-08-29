@@ -35,19 +35,29 @@ export const updateReservation = async ({
     });
   }
 
-  const { meccahHotel, madinaHotel, members } = data;
+  const { rooms } = data;
 
-  await db.reservation.update({
-    where: { id: reservationId },
-    data: {
-      reservationMembers: {
-        updateMany: members.map(({ id, ...member }) => ({
-          where: { id: id },
-          data: member,
-        })),
+  await db.$transaction([
+    ...rooms
+      .flatMap((room) => room.members)
+      .map(({ id, ...member }) =>
+        db.reservationMember.update({
+          where: { id },
+          data: { ...member },
+        })
+      ),
+    db.reservation.update({
+      where: { id: reservationId },
+      data: {
+        history: {
+          create: {
+            userId: user?.id || "",
+            type: "DATA",
+          },
+        },
       },
-    },
-  });
+    }),
+  ]);
 
   revalidatePath("/");
 };

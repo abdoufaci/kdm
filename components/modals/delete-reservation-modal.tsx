@@ -38,8 +38,8 @@ export const DeleteReservationModal = () => {
         <DialogHeader className="py-2 ">
           <DialogTitle className="text-xl font-semibold text-left"></DialogTitle>
         </DialogHeader>
-        <h1 className="text-lg font-medium text-center">
-          You Sure you want to delete reservation of the ref{" "}
+        <h1 dir="rtl" className="text-lg font-medium text-center">
+          هل أنت متأكد أنك تريد حذف الحجز ذو المرجع{" "}
           <span className="text-brand">{reservation?.ref}</span>
         </h1>
         <div className="grid grid-cols-1 md:!grid-cols-2 place-items-center gap-3">

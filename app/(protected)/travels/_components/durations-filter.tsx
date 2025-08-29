@@ -33,14 +33,16 @@ function DurationsFilter({ durations, searchParams }: Props) {
         );
         router.push(url);
       }}>
-      <SelectTrigger className="w-32 cursor-pointer">
-        <SelectValue placeholder="durations" />
+      <SelectTrigger dir="rtl" className="w-32 cursor-pointer">
+        <SelectValue placeholder="المدة" />
       </SelectTrigger>
       <SelectContent className="border-[#B9BEC7]">
-        <SelectItem value={"default"}>Default</SelectItem>
+        <SelectItem dir="rtl" value={"default"}>
+          لا شيئ
+        </SelectItem>
         {durations.map((duration) => (
-          <SelectItem key={duration} value={duration}>
-            {duration} nuits
+          <SelectItem dir="rtl" key={duration} value={duration}>
+            {duration} ليالي
           </SelectItem>
         ))}
       </SelectContent>

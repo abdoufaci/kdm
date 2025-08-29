@@ -8,6 +8,8 @@ import ReservationsTable from "@/components/reservations-table";
 import TraveDetails from "@/components/trave-details";
 import { currentUser } from "@/lib/auth";
 import DepartDatesFilter from "../travels/_components/depart-dates-filter";
+import ReservationPaymentStatusFilter from "@/components/filters/reservation-payment-status-filter";
+import ReservationStatusFilter from "@/components/filters/reservation-status-filter";
 
 async function ReservationsPage({
   searchParams,
@@ -27,10 +29,22 @@ async function ReservationsPage({
   const { departDates } = await getReservationValues();
 
   return (
-    <div className="py-16 space-y-7">
+    <div dir="rtl" className="py-16 space-y-7">
       <div className="flex items-center justify-between gap-5 flex-wrap w-full">
-        <SearchFilter searchParams={await searchParams} url="/reservations" />
+        <SearchFilter
+          searchParams={await searchParams}
+          url="/reservations"
+          inputClassName="pr-9 pl-4"
+        />
         <div className="flex items-center gap-5">
+          <ReservationPaymentStatusFilter
+            searchParams={await searchParams}
+            url={`/reservations`}
+          />
+          <ReservationStatusFilter
+            searchParams={await searchParams}
+            url={`/reservations`}
+          />
           <DepartDatesFilter
             url="/reservations"
             searchParams={await searchParams}

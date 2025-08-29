@@ -50,7 +50,7 @@ function Header({ user }: Props) {
           orientation="vertical"
           className="w-1.5 min-w-0.5 h-1 min-h-12 bg-[#00000038] rounded-full"
         />
-        <h1 className="text-[#3F3934] text-xl font-medium">{title}</h1>
+        <h1 className="text-[#3F3934] text-xl font-bold">{title}</h1>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger className="cursor-pointer" asChild>
@@ -73,13 +73,14 @@ function Header({ user }: Props) {
           {(user?.role === "ADMIN" ? adminNavigations : clientNavigations).map(
             ({ title, href }, idx) => (
               <Link key={idx} href={href}>
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem dir="rtl" className="cursor-pointer">
                   <h1>{title}</h1>
                 </DropdownMenuItem>
               </Link>
             )
           )}
           <DropdownMenuItem
+            dir="rtl"
             disabled={isPending}
             onClick={() =>
               startTransition(() => {
@@ -87,7 +88,7 @@ function Header({ user }: Props) {
               })
             }
             className="bg-[#FF00000F] text-[#FF0000] hover:!text-[#FF0000] hover:!bg-[#FF00000F] focus-within:bg-[#FF00000F] cursor-pointer">
-            <h1>Logout</h1>
+            تسجيل خروج
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

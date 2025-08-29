@@ -1,6 +1,7 @@
 import { currentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ExtendedUser } from "@/types/next-auth";
+import { ReservationPaymentStatus, ReservationStatus } from "@prisma/client";
 
 export const getReservationsCount = async ({
   travelId,
@@ -14,7 +15,8 @@ export const getReservationsCount = async ({
   let DateFrom: Date | null = null;
   let DateTo: Date | null = null;
 
-  const { dateFrom, dateTo, agency, search, date } = await searchParams;
+  const { dateFrom, dateTo, agency, search, date, status, paymentStatus } =
+    await searchParams;
 
   if (dateFrom) {
     DateFrom = new Date(dateFrom);
@@ -38,6 +40,12 @@ export const getReservationsCount = async ({
 
   return await db.reservation.count({
     where: {
+      ...(status && {
+        status: status as ReservationStatus,
+      }),
+      ...(paymentStatus && {
+        paymentStatus: paymentStatus as ReservationPaymentStatus,
+      }),
       ...(search && {
         OR: [
           {
@@ -63,37 +71,29 @@ export const getReservationsCount = async ({
             },
           },
           {
-            meccahHotel: {
-              name: {
-                contains: search,
-                mode: "insensitive",
-              },
-            },
-          },
-          {
-            madinaHotel: {
-              name: {
-                contains: search,
-                mode: "insensitive",
-              },
-            },
-          },
-          {
-            reservationMembers: {
+            reservationRooms: {
               some: {
-                name: {
-                  contains: search,
-                  mode: "insensitive",
+                reservationMembers: {
+                  some: {
+                    name: {
+                      contains: search,
+                      mode: "insensitive",
+                    },
+                  },
                 },
               },
             },
           },
           {
-            reservationMembers: {
+            reservationRooms: {
               some: {
-                passportNumber: {
-                  contains: search,
-                  mode: "insensitive",
+                reservationMembers: {
+                  some: {
+                    passportNumber: {
+                      contains: search,
+                      mode: "insensitive",
+                    },
+                  },
                 },
               },
             },

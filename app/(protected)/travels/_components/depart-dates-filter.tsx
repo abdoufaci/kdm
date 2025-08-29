@@ -40,13 +40,15 @@ function DepartDatesFilter({ departs, searchParams, url: pathname }: Props) {
         );
         router.push(url);
       }}>
-      <SelectTrigger className="w-32 cursor-pointer">
-        <SelectValue placeholder="Date de depart" />
+      <SelectTrigger dir="rtl" className="w-32 cursor-pointer">
+        <SelectValue placeholder="تاريخ الانطلاق" />
       </SelectTrigger>
       <SelectContent className="border-[#B9BEC7]">
-        <SelectItem value={"default"}>Default</SelectItem>
+        <SelectItem dir="rtl" value={"default"}>
+          لا شيئ
+        </SelectItem>
         {departs.map((depart) => (
-          <SelectItem key={depart} value={depart}>
+          <SelectItem dir="rtl" key={depart} value={depart}>
             {depart}
           </SelectItem>
         ))}

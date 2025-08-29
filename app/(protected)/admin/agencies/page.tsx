@@ -33,14 +33,15 @@ async function AdminPage({
   const totalAgencies = await getAgenciesCount(searchParams);
 
   return (
-    <div className="py-10 space-y-5">
+    <div dir="rtl" className="py-10 space-y-5">
       <div className="flex flex-col md:!flex-row items-start justify-between gap-5">
         <div className="flex flex-col sm:!flex-row items-start gap-5 w-full">
           <SearchFilter
             searchParams={await searchParams}
             url="/admin/agencies"
+            inputClassName="pr-9"
           />
-          <OpenDialogButton title="Ajouter une agence" type="manageAgency" />
+          <OpenDialogButton title="اضافة وكالة" type="manageAgency" />
         </div>
         <DateFilter searchParams={await searchParams} url="/admin/agencies" />
       </div>

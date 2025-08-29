@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { Hotel, Travel, User } from "@prisma/client";
-import { ReservationWithMembers, TravelWithHotels } from "@/types/types";
+import {
+  PaymentWithUserWithReservation,
+  ReservationWithMembers,
+  TravelWithHotels,
+  TravelWithHotelsWithReservations,
+} from "@/types/types";
 
 export type ModalType =
   | "manageAgency"
@@ -9,14 +14,18 @@ export type ModalType =
   | "deleteTravel"
   | "manageReservation"
   | "setAgencyPassword"
-  | "deleteReservation";
+  | "deleteReservation"
+  | "managePayment"
+  | "deletePayment"
+  | "reservationDetails";
 
 export interface ModalData {
   user?: User;
-  travel?: TravelWithHotels;
+  travel?: TravelWithHotelsWithReservations;
   hotels?: Hotel[];
   isEdit?: boolean;
   reservation?: ReservationWithMembers;
+  payment?: PaymentWithUserWithReservation;
 }
 
 interface ModalStore {

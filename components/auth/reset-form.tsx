@@ -46,8 +46,8 @@ export function ResetForm() {
 
   return (
     <CardWrapper
-      headerLabel="Forgot your password?"
-      backButtonLabel="Back to login"
+      headerLabel="نسيت كلمة المرور ؟"
+      backButtonLabel="العودة الى تسجيل الدخول"
       backButtonHref="/auth/login">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -57,12 +57,14 @@ export function ResetForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[#A4A4A4]">Email</FormLabel>
+                  <FormLabel className="text-[#A4A4A4] flex justify-end">
+                    البريد الالكتورني
+                  </FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={isPending}
-                      placeholder="abdou@example.com"
+                      placeholder="example@gmail.com"
                       className="auth-input placeholder:text-white/50 text-white border-none"
                     />
                   </FormControl>
@@ -78,7 +80,7 @@ export function ResetForm() {
             disabled={isPending}
             variant={"brand"}
             className="w-full">
-            Send reset email
+            إرسال بريد إلكتروني لإعادة التعيين
           </Button>
         </form>
       </Form>

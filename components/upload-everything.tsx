@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { boolean } from "zod";
 import { deleteEverythingFile } from "@/actions/mutations/delete-everthing-file";
 import Dropzone from "./Dropzone";
+import Link from "next/link";
 
 interface Props {
   onChange: (url?: any) => void;
@@ -134,21 +135,25 @@ export const UploadEverything = ({
                 />
               </div>
             ) : (
-              <div className="relative w-[300px]">
-                <div className="w-[300px] rounded-[19.14px] p-3 bg-brand">
-                  <div className="flex items-start gap-4 mr-20">
-                    <div className="h-12 w-12 rounded-full flex items-center justify-center bg-[#FFFFFF69]">
+              <div className="relative w-full">
+                <Link
+                  target="_blank"
+                  href={`https://${process.env.NEXT_PUBLIC_BUNNY_CDN_HOSTNAME}/${file.id}`}>
+                  <div className="w-full rounded-[5px] p-5 bg-[#D458471C]">
+                    <div className="flex items-center gap-4 mr-20">
                       <FileIcon />
-                    </div>
-                    <div className="space-y-0">
-                      <h1 className="text-white font-medium">Document</h1>
+                      <h1 className="text-brand font-medium">Document</h1>
                     </div>
                   </div>
-                </div>
-                <XIcon
-                  className="h-7 w-7 text-[#ED2323] bg-[#EB16194A] rounded-full p-1.5 cursor-pointer absolute top-1 right-1"
-                  onClick={() => mutate(file)}
-                />
+                  <XIcon
+                    className="h-7 w-7 text-[#ED2323] bg-[#EB16194A] rounded-full p-1.5 cursor-pointer absolute top-1/2 transform -translate-y-1/2 right-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      mutate(file);
+                    }}
+                  />
+                </Link>
               </div>
             )
           )}

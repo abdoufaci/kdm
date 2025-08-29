@@ -70,9 +70,17 @@ export const getTravels = async ({
     include: {
       hotels: true,
       reservations: {
-        where: { userId: user?.id || "" },
         include: {
-          reservationMembers: true,
+          reservationRooms: {
+            include: {
+              reservationMembers: true,
+            },
+          },
+        },
+      },
+      prices: {
+        include: {
+          hotel: true,
         },
       },
     },

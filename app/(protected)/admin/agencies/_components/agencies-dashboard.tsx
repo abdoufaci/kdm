@@ -84,27 +84,25 @@ export default function AgenciesDashboard({
             <Table>
               <TableHeader>
                 <TableRow className="border-none">
-                  <TableHead className="text-[#232323] font-medium">
-                    Agence
+                  <TableHead className="text-[#232323] font-medium text-right">
+                    وكالة
                   </TableHead>
-                  <TableHead className="text-[#232323] font-medium">
-                    Email
+                  <TableHead className="text-[#232323] font-medium text-right">
+                    البريد الالكتروني
                   </TableHead>
-                  <TableHead className="text-[#232323] font-medium">
-                    Telephone
+                  <TableHead className="text-[#232323] font-medium text-right">
+                    الهاتف
                   </TableHead>
-                  <TableHead className="text-[#232323] font-medium">
-                    Adress
+                  <TableHead className="text-[#232323] font-medium text-right">
+                    العنوان
                   </TableHead>
-                  <TableHead className="text-[#232323] font-medium">
-                    Date de création
+                  <TableHead className="text-[#232323] font-medium text-right">
+                    تاريخ الدخول
                   </TableHead>
-                  <TableHead className="text-[#232323] font-medium">
-                    Username
+                  <TableHead className="text-[#232323] font-medium text-right">
+                    اسم المستخدم
                   </TableHead>
-                  <TableHead className="text-[#232323] font-medium">
-                    Password
-                  </TableHead>
+                  <TableHead className="text-[#232323] font-medium text-right"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="space-y-2">
@@ -163,7 +161,7 @@ export default function AgenciesDashboard({
                         variant={"blackOutline"}
                         size={"sm"}
                         className="text-xs">
-                        Set Password
+                        كلمة مرور جديدة
                       </Button>
                     </TableCell>
                     <TableCell>
@@ -190,19 +188,14 @@ export default function AgenciesDashboard({
           </div>
 
           <div className="flex flex-col md:!flex-row md:!items-center justify-between gap-4">
-            <div className="text-sm text-gray-400">
-              Showing {(currentPage - 1) * agenciesPerPage + 1} to{" "}
-              {Math.min(currentPage * agenciesPerPage, totalAgencies)} of{" "}
-              {totalAgencies} entries
-            </div>
             <div className="flex flex-wrap items-center space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
                 className="text-black">
-                Previous
+                التالي
               </Button>
               {Array.from(Array(totalPages).keys()).map((_, idx) => {
                 const url = qs.stringifyUrl(
@@ -237,11 +230,18 @@ export default function AgenciesDashboard({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
                 className="text-black">
-                Next
+                السابق
               </Button>
+            </div>
+            <div className="text-sm text-gray-400">
+              <div dir="rtl" className="text-sm text-gray-400">
+                عرض {(currentPage - 1) * agenciesPerPage + 1} إلى{" "}
+                {Math.min(currentPage * agenciesPerPage, totalAgencies)} من{" "}
+                {totalAgencies} إدخالات
+              </div>
             </div>
           </div>
         </div>

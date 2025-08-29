@@ -23,9 +23,15 @@ export const updateTravel = async ({
   if (!travelId) {
     throw new Error("travel not found");
   }
-
-  const meccahMadinaDays = `${data.madinaDays} madina - ${data.meccahDays} meccah`;
-  const { meccahDays, madinaDays, meccahHotels, madinaHotels, ...rest } = data;
+  const meccahMadinaDays = `${data.madinaDays} مدينة - ${data.meccahDays} مكة`;
+  const {
+    meccahDays,
+    madinaDays,
+    meccahHotels,
+    madinaHotels,
+    prices,
+    ...rest
+  } = data;
 
   const hotels = [
     ...madinaHotels.map((hotel) => ({ id: hotel.id })),
@@ -40,6 +46,12 @@ export const updateTravel = async ({
       hotels: {
         connect: hotels,
         disconnect: hotelsToRemove.map((hotel) => ({ id: hotel.id })),
+      },
+      prices: {
+        deleteMany: {},
+        createMany: {
+          data: prices.map(({ id, ...price }) => price),
+        },
       },
     },
   });

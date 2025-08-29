@@ -10,7 +10,7 @@ async function AdminLayout({
   const user = await currentUser();
 
   return (
-    <div className="min-h-screen w-[90%] md:!w-[85%] mx-auto">
+    <div lang="ar" className="min-h-screen w-[90%] md:!w-[85%] mx-auto">
       <Header user={user} />
       <div>{children}</div>
     </div>

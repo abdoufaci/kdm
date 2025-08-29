@@ -19,8 +19,8 @@ export const ManageAgencyModal = () => {
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="bg-white text-black w-full max-w-3xl">
         <DialogHeader className="py-2 ">
-          <DialogTitle className="text-xl text-[#232323] font-semibold text-left">
-            {data?.reservation ? "Manager" : "Ajouter"} Reservation
+          <DialogTitle className="text-xl text-[#232323] font-semibold text-right">
+            اضافة وكالة
           </DialogTitle>
         </DialogHeader>
         <ScrollArea className="h-[500px]">

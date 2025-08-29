@@ -10,11 +10,13 @@ import ShortUniqueId from "short-unique-id";
 export const addReservation = async ({
   data,
   travelId,
-  currentAvailabelSports,
+  currentSavedSpots,
+  availabelSpots,
 }: {
   data: z.infer<typeof ManageReservationformSchema>;
   travelId?: string;
-  currentAvailabelSports: number;
+  currentSavedSpots: number;
+  availabelSpots: number;
 }) => {
   if (!travelId) {
     throw new Error("Travel not found");
@@ -26,38 +28,73 @@ export const addReservation = async ({
     throw new Error("Unauthorized");
   }
 
-  const { meccahHotel, madinaHotel, members } = data;
+  const { rooms } = data;
 
-  const availabelSpots =
-    currentAvailabelSports -
-    members.filter((member) => member.type !== "BABY").length;
+  const savedSpots =
+    currentSavedSpots +
+    rooms.reduce(
+      (acc, room) =>
+        acc + room.members.filter((member) => member.type === "ADULT").length,
+      0
+    );
 
-  if (availabelSpots < 0) {
-    return { error: "Places disponibles insuffisantes" };
+  if (availabelSpots - savedSpots < 0) {
+    return { error: "أماكن متوفرة غير كافية" };
   }
 
   const uid = new ShortUniqueId({ length: 10 });
   const ref = uid.rnd();
 
-  await db.travel.update({
-    where: { id: travelId },
-    data: {
-      availabelSpots: String(availabelSpots),
-      reservations: {
-        create: {
-          ref,
-          meccahHotelId: meccahHotel.id,
-          madinaHotelId: madinaHotel?.id,
-          userId: user.id || "",
-          reservationMembers: {
-            createMany: {
+  await db.$transaction(async (tx) => {
+    // Step 1: Create the reservation with rooms
+    const updatedTravel = await tx.travel.update({
+      where: { id: travelId },
+      data: {
+        reservations: {
+          //@ts-ignore
+          create: {
+            ref,
+            userId: user.id || "",
+            reservationRooms: {
               //@ts-ignore
-              data: members.map(({ id, ...member }) => member),
+              create: rooms.map(
+                ({ meccahHotel, madinaHotel, roomType, members }) => ({
+                  roomType,
+                  meccahHotelId: meccahHotel?.id,
+                  madinaHotelId: madinaHotel?.id,
+                  reservationMembers: {
+                    create: members.map((member) => ({
+                      id: member.id,
+                      name: member.name,
+                      type: member.type,
+                      dob: member.dob,
+                      sex: member.sex,
+                      foodIclusions: member.foodIclusions,
+                      passport: member.passport,
+                      passportNumber: member.passportNumber,
+                      passportExpiryDate: member.passportExpiryDate,
+                    })),
+                  },
+                })
+              ),
             },
           },
         },
       },
-    },
+      include: {
+        reservations: {
+          include: {
+            reservationRooms: {
+              include: {
+                reservationMembers: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return updatedTravel;
   });
 
   revalidatePath("/");

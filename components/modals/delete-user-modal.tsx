@@ -39,17 +39,17 @@ export const DeleteUserModal = () => {
         <DialogHeader className="py-2 ">
           <DialogTitle className="text-xl font-semibold text-left"></DialogTitle>
         </DialogHeader>
-        <h1 className="text-lg font-medium text-center">
-          You Sure you want to delete{" "}
-          <span className="text-brand">@{user?.name}</span> of the email{" "}
-          <span className="text-brand">{user?.email}</span>
+        <h1 dir="rtl" className="text-lg font-medium text-center">
+          انت متأكد أنك تريد حذف{" "}
+          <span className="text-brand">@{user?.name}</span> صاحب البريد
+          الالكتروني <span className="text-brand">{user?.email}</span>
         </h1>
         <div className="grid grid-cols-1 md:!grid-cols-2 place-items-center gap-3">
           <Button
             onClick={() => onOpen("manageAgency", { user })}
             size={"lg"}
             className="w-full rounded-full">
-            Cancel
+            الغاء
           </Button>
           <Button
             disabled={isPending}
@@ -58,7 +58,7 @@ export const DeleteUserModal = () => {
             variant={"destructive"}
             size={"lg"}
             className="w-full rounded-full">
-            Delete Student
+            حذف
           </Button>
         </div>
       </DialogContent>

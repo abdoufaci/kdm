@@ -36,13 +36,15 @@ function AgencyFilter({ agencies, searchParams, url: pathname }: Props) {
         );
         router.push(url);
       }}>
-      <SelectTrigger className="w-32 cursor-pointer">
-        <SelectValue placeholder="Agence" />
+      <SelectTrigger dir="rtl" className="w-32 cursor-pointer">
+        <SelectValue placeholder="الوكالة" />
       </SelectTrigger>
       <SelectContent className="border-[#B9BEC7]">
-        <SelectItem value={"default"}>Default</SelectItem>
+        <SelectItem dir="rtl" value={"default"}>
+          لا شيء
+        </SelectItem>
         {agencies.map((agency) => (
-          <SelectItem key={agency.id} value={agency.id}>
+          <SelectItem dir="rtl" key={agency.id} value={agency.id}>
             {agency.username}
           </SelectItem>
         ))}

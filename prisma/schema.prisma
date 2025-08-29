@@ -29,6 +29,8 @@ model User {
 
   travels      Travel[]
   reservations Reservation[]
+  payments     Payment[]
+  history      ReservationHistory[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -99,18 +101,41 @@ model Travel {
   duration         String
   meccahMadinaDays String
   availabelSpots   String
-  double           String
-  triple           String
-  quadruple        String
-  quintuple        String
   description      String   @db.Text
   ref              String
+  departTime       String
+  arriveTime       String
+  arrivePlace      String
+  leavePlace       String
+  airline          String
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   reservations Reservation[]
   hotels       Hotel[]
+  prices       TravelPrices[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TravelPrices {
+  id         String @id @default(cuid())
+  double     String
+  triple     String
+  quadruple  String
+  quintuple  String
+  child      String
+  babe       String
+  commission String
+  food       String
+
+  hotelId String
+  hotel   Hotel  @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  travelId String
+  travel   Travel @relation(fields: [travelId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -127,22 +152,30 @@ model Hotel {
   location HotelLocation
 
   travels            Travel[]
-  meccahReservations Reservation[] @relation(name: "meccahHotel")
-  madinaReservations Reservation[] @relation(name: "madinaHotel")
+  meccahReservations ReservationRoom[] @relation(name: "meccahHotel")
+  madinaReservations ReservationRoom[] @relation(name: "madinaHotel")
+  TravelPrices       TravelPrices[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum ReservationPaymentStatus {
+  PENDING
+  COMPLETED
+}
+
 model Reservation {
-  id  String @id @default(cuid())
-  ref String @unique
-
-  meccahHotelId String
-  meccahHotel   Hotel  @relation(fields: [meccahHotelId], references: [id], onDelete: Cascade, name: "meccahHotel")
-
-  madinaHotelId String?
-  madinaHotel   Hotel?  @relation(fields: [madinaHotelId], references: [id], onDelete: Cascade, name: "madinaHotel")
+  id            String                   @id @default(cuid())
+  ref           String                   @unique
+  status        ReservationStatus        @default(PENDING)
+  paymentStatus ReservationPaymentStatus @default(PENDING)
 
   travelId String
   travel   Travel @relation(fields: [travelId], references: [id], onDelete: Cascade)
@@ -150,7 +183,59 @@ model Reservation {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  reservationRooms ReservationRoom[]
+  payments         Payment[]
+  history          ReservationHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ReservationHistoryType {
+  PAYMENT
+  STATUS
+  DATA
+}
+
+model ReservationHistory {
+  id        String                 @id @default(cuid())
+  type      ReservationHistoryType
+  amount    String?
+  oldStatus ReservationStatus?
+  newStatus ReservationStatus?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  reservationId String
+  Reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum RoomType {
+  DOUBLE
+  TRIPLE
+  QUADRUPLE
+  QUINTUPLE
+  COLLECTIVE
+}
+
+model ReservationRoom {
+  id       String   @id @default(cuid())
+  roomType RoomType
+
+  meccahHotelId String
+  meccahHotel   Hotel  @relation(fields: [meccahHotelId], references: [id], onDelete: Cascade, name: "meccahHotel")
+
+  madinaHotelId String?
+  madinaHotel   Hotel?  @relation(fields: [madinaHotelId], references: [id], onDelete: Cascade, name: "madinaHotel")
+
   reservationMembers ReservationMember[]
+
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -165,14 +250,31 @@ enum MemberType {
 model ReservationMember {
   id                 String     @id @default(cuid())
   name               String
+  sex                String     @default("ذكر")
   type               MemberType
   dob                DateTime
   passportNumber     String
   passportExpiryDate DateTime
   passport           Json
+  foodIclusions      Boolean    @default(false)
 
-  reservationId String
-  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  reservationRoomId String
+  reservationRoom   ReservationRoom @relation(fields: [reservationRoomId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id         String @id @default(cuid())
+  amount     String
+  paymentRef String @unique
+
+  reservationRef String
+  reservation    Reservation @relation(fields: [reservationRef], references: [ref], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

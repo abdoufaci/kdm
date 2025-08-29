@@ -33,13 +33,15 @@ function DistributionsFilter({ distributions, searchParams }: Props) {
         );
         router.push(url);
       }}>
-      <SelectTrigger className="w-32 cursor-pointer">
-        <SelectValue placeholder="distributions" />
+      <SelectTrigger dir="rtl" className="w-32 cursor-pointer">
+        <SelectValue placeholder="التوزيع" />
       </SelectTrigger>
       <SelectContent className="border-[#B9BEC7]">
-        <SelectItem value={"default"}>Default</SelectItem>
+        <SelectItem dir="rtl" value={"default"}>
+          لا شيئ
+        </SelectItem>
         {distributions.map((distribution) => (
-          <SelectItem key={distribution} value={distribution}>
+          <SelectItem dir="rtl" key={distribution} value={distribution}>
             {distribution}
           </SelectItem>
         ))}

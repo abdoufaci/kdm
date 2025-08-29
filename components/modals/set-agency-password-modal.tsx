@@ -20,8 +20,10 @@ export const SetAgencyPasswordModal = () => {
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="bg-white text-black w-full max-w-3xl">
         <DialogHeader className="py-2 ">
-          <DialogTitle className="text-xl text-[#232323] font-semibold text-left">
-            Définir le mot de passe{" "}
+          <DialogTitle
+            dir="rtl"
+            className="text-xl text-[#232323] font-semibold text-right">
+            تعيين كلمة المرور{" "}
             <span className="text-base text-brand font-normal">
               {data?.user?.username}
             </span>

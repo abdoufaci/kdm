@@ -1,29 +1,166 @@
-import { TravelWithHotels } from "@/types/types";
+"use client";
+
+import {
+  ReservationWithMembers,
+  TravelWithHotels,
+  TravelWithHotelsWithReservations,
+} from "@/types/types";
 import { OpenDialogButton } from "@/components/open-dialog-button";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { Clock4, PlaneLanding, PlaneTakeoff, UsersRound } from "lucide-react";
+import {
+  Clock4,
+  Eye,
+  EyeOff,
+  Plane,
+  PlaneLanding,
+  PlaneTakeoff,
+  UsersRound,
+} from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Separator } from "./ui/separator";
+import { MultipleHotelPDFs } from "@/app/(protected)/admin/voucher/_components/multiple-hotel-pdfs";
+import { ExtendedUser } from "@/types/next-auth";
+import { Hotel, ReservationMember } from "@prisma/client";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 
+type HotelWithMembers = {
+  hotel: Hotel;
+  members: ReservationMember[];
+};
 interface Props {
-  travel: TravelWithHotels;
+  travel: TravelWithHotelsWithReservations;
+  reservations: ReservationWithMembers[];
+  user?: ExtendedUser;
 }
 
-function TraveDetails({ travel }: Props) {
+function TraveDetails({ travel, reservations, user }: Props) {
+  const [show, setShow] = useState(false);
+
+  const savedSpots = travel.reservations
+    .filter((reservation) => reservation.status !== "CANCELLED")
+    .reduce(
+      (acc, reservation) =>
+        acc +
+        reservation.reservationRooms.reduce(
+          (acc, room) =>
+            acc +
+            room.reservationMembers.filter((member) => member.type === "ADULT")
+              .length,
+          0
+        ),
+      0
+    );
+
+  const manMembers = travel.reservations
+    .filter((reservation) => reservation.status !== "CANCELLED")
+    .flatMap((reservation) =>
+      reservation.reservationRooms.filter(
+        (room) => room.roomType === "COLLECTIVE"
+      )
+    )
+    .flatMap((reservation) =>
+      reservation.reservationMembers.filter((member) => member.sex === "ذكر")
+    );
+
+  const womanMembers = travel.reservations
+    .filter((reservation) => reservation.status !== "CANCELLED")
+    .flatMap((reservation) =>
+      reservation.reservationRooms.filter(
+        (room) => room.roomType === "COLLECTIVE"
+      )
+    )
+    .flatMap((reservation) =>
+      reservation.reservationMembers.filter((member) => member.sex !== "ذكر")
+    );
+
+  function getHotelsWithMembers(
+    travel: TravelWithHotelsWithReservations,
+    sex: string
+  ): HotelWithMembers[] {
+    return travel.hotels.map((hotel) => {
+      const members: ReservationMember[] = [];
+
+      travel.reservations
+        .filter((reservation) => reservation.status !== "CANCELLED")
+        .forEach((reservation) => {
+          reservation.reservationRooms
+            .filter((room) => room.roomType === "COLLECTIVE")
+            .forEach((room) => {
+              // check if this room is linked to the current hotel
+              if (
+                room.meccahHotelId === hotel.id ||
+                room.madinaHotelId === hotel.id
+              ) {
+                members.push(
+                  ...room.reservationMembers.filter((m) => m.sex === sex)
+                );
+              }
+            });
+        });
+
+      return { hotel, members };
+    });
+  }
+
+  function roomDistribution(
+    hotelsWithMembers: { hotel: Hotel; members: ReservationMember[] }[]
+  ) {
+    const membersPerRoom = 5;
+
+    return hotelsWithMembers.map(({ hotel, members }) => {
+      const rooms = Math.ceil(members.length / membersPerRoom);
+      const emptyPlaces = rooms * membersPerRoom - members.length;
+
+      return {
+        hotel,
+        emptyPlaces,
+        rooms,
+      };
+    });
+  }
+
+  const manHotels = roomDistribution(getHotelsWithMembers(travel, "ذكر"));
+  const womanHotels = roomDistribution(getHotelsWithMembers(travel, "انثى"));
+
+  const manRooms = manHotels.reduce((acc, hotel) => acc + hotel.rooms, 0);
+  const womanRooms = womanHotels.reduce((acc, hotel) => acc + hotel.rooms, 0);
+
+  console.log({
+    man: getHotelsWithMembers(travel, "ذكر"),
+    manHotels,
+  });
+  const manEmptyPlaces = manHotels.reduce(
+    (acc, hotel) => acc + hotel.emptyPlaces,
+    0
+  );
+  const womanEmptyPlaces = womanHotels.reduce(
+    (acc, hotel) => acc + hotel.emptyPlaces,
+    0
+  );
+
   return (
-    <div className="space-y-5">
-      <h1 className="text-2xl font-semibold">{travel?.name}</h1>
-      <div className="grid grid-cols-1 lg:!grid-cols-[65%_35%] gap-5">
+    <div className="space-y-20">
+      <div className="space-y-5">
+        <h1 className="text-2xl font-semibold">{travel?.name}</h1>
         <div className="space-y-8">
           <div className="flex items-center gap-7 flex-wrap">
             <div className="flex items-center gap-5">
+              <Plane className="h-5 w-5 text-brand fill-brand" />
+              <h3 className="text-[#646768]">{travel.airline}</h3>
+            </div>
+            <div className="flex items-center gap-5">
               <PlaneTakeoff className="h-5 w-5 text-brand fill-brand" />
               <h3 className="text-[#646768]">
+                {travel.arrivePlace} - {travel.departTime} -
                 {format(travel.departDate, "dd/MM/yyyy")}
               </h3>
             </div>
             <div className="flex items-center gap-5">
               <PlaneLanding className="h-5 w-5 text-brand fill-brand" />
               <h3 className="text-[#646768]">
+                {travel.leavePlace} - {travel.arriveTime} -{" "}
                 {format(travel.arriveDate, "dd/MM/yyyy")}
               </h3>
             </div>
@@ -41,7 +178,7 @@ function TraveDetails({ travel }: Props) {
                 />
               </svg>
 
-              <h3 className="text-[#646768]">{travel.duration} nuits</h3>
+              <h3 className="text-[#646768]">{travel.duration} ليالي</h3>
             </div>
             <div className="flex items-center gap-5">
               <svg
@@ -57,10 +194,10 @@ function TraveDetails({ travel }: Props) {
               </svg>
 
               <h3 className="text-[#646768]">
-                {travel.availabelSpots} restant
+                {Number(travel.availabelSpots) - savedSpots} مقعد متبقي
               </h3>
             </div>
-            <div className="flex items-center gap-5">
+            {/* <div className="flex items-center gap-5">
               <svg
                 width="26"
                 height="13"
@@ -73,68 +210,302 @@ function TraveDetails({ travel }: Props) {
                 />
               </svg>
 
-              <h3 className="text-[#646768]">15 reserve</h3>
+              <h3 className="text-[#646768]">
+                {reservations.reduce(
+                  (acc, reservation) =>
+                    acc +
+                    reservation.reservationMembers.filter(
+                      (member) => member.type === "ADULT"
+                    ).length,
+                  0
+                )}{" "}
+                مقعد متبقي
+              </h3>
+            </div> */}
+          </div>
+          <div className="flex flex-wrap justify-between items-center gap-5">
+            <p className="text-[#585757] w-full max-w-5xl">
+              {travel.description}
+            </p>
+            {Number(travel.availabelSpots) - savedSpots > 0 && (
+              <OpenDialogButton
+                type="manageReservation"
+                title="احجز"
+                data={{ travel, hotels: travel.hotels }}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="overflow-x-auto">
+        <div className="flex items-center w-full">
+          <div className="border border-[#00000059] border-l-0 flex items-center justify-center p-3 rounded-tr-sm min-w-48 w-full">
+            <h1 className="text-[#00000094] text-sm">فنادق مكة</h1>
+          </div>
+          <div className="border border-[#00000059] border-l-0 flex items-center justify-center p-3 min-w-48 w-full">
+            <h1 className="text-[#00000094] text-sm">الثنائية</h1>
+          </div>
+          <div className="border border-[#00000059] border-l-0 flex items-center justify-center p-3 min-w-48 w-full">
+            <h1 className="text-[#00000094] text-sm">الثلاثية</h1>
+          </div>
+          <div className="border border-[#00000059] border-l-0 flex items-center justify-center p-3 min-w-48 w-full">
+            <h1 className="text-[#00000094] text-sm">الرباعية</h1>
+          </div>
+          <div className="border border-[#00000059] border-l-0 flex items-center justify-center p-3 min-w-48 w-full">
+            <h1 className="text-[#00000094] text-sm">الخماسية</h1>
+          </div>
+          <div className="border border-[#00000059] border-l-0 flex items-center justify-center p-3 min-w-48 w-full">
+            <h1 className="text-[#00000094] text-sm">الطفل</h1>
+          </div>
+          <div className="border border-[#00000059] border-l-0 flex items-center justify-center p-3 min-w-48 w-full">
+            <h1 className="text-[#00000094] text-sm">الرضيع</h1>
+          </div>
+          <div className="border border-[#00000059] border-l-0 flex items-center justify-center p-3 min-w-48 w-full">
+            <h1 className="text-[#00000094] text-sm">الإعاشة</h1>
+          </div>
+          <div className="border border-[#00000059] flex items-center gap-5 justify-center p-3 rounded-tl-sm min-w-48 w-full">
+            <h1 className="text-[#00000094] text-sm">
+              {show ? "العمولة" : "******"}
+            </h1>
+            {show ? (
+              <EyeOff
+                onClick={() => setShow(false)}
+                className="h-5 w-5 cursor-pointer text-[#A4A4A4]"
+              />
+            ) : (
+              <Eye
+                onClick={() => setShow(true)}
+                className="h-5 w-5 cursor-pointer text-[#A4A4A4]"
+              />
+            )}
+          </div>
+        </div>
+        {travel.prices.map((price, idx) => (
+          <div key={price.id} className="flex items-center w-full">
+            <div
+              className={cn(
+                "border border-[#00000059] border-l-0 border-t-0 flex items-center justify-center p-3 min-w-48 w-full",
+                idx === travel.prices.length - 1 && "rounded-br-sm",
+                idx !== travel.prices.length - 1 && "border-b-[#D9D9D96B]"
+              )}>
+              <h1 className="text-[#00000094] text-sm">{price.hotel.name}</h1>
+            </div>
+            <div
+              dir="ltr"
+              className={cn(
+                "text-[#00000094] text-sm border border-[#00000059] border-l-0 border-t-0 flex items-center justify-center p-3 min-w-48 w-full",
+                idx !== travel.prices.length - 1 && "border-b-[#D9D9D96B]"
+              )}>
+              {price.double} da
+            </div>
+            <div
+              dir="ltr"
+              className={cn(
+                "text-[#00000094] text-sm border border-[#00000059] border-l-0 border-t-0 flex items-center justify-center p-3 min-w-48 w-full",
+                idx !== travel.prices.length - 1 && "border-b-[#D9D9D96B]"
+              )}>
+              {price.triple} da
+            </div>
+            <div
+              dir="ltr"
+              className={cn(
+                "text-[#00000094] text-sm border border-[#00000059] border-l-0 border-t-0 flex items-center justify-center p-3 min-w-48 w-full",
+                idx !== travel.prices.length - 1 && "border-b-[#D9D9D96B]"
+              )}>
+              {price.quadruple} da
+            </div>
+            <div
+              dir="ltr"
+              className={cn(
+                "text-[#00000094] text-sm border border-[#00000059] border-l-0 border-t-0 flex items-center justify-center p-3 min-w-48 w-full",
+                idx !== travel.prices.length - 1 && "border-b-[#D9D9D96B]"
+              )}>
+              {price.quintuple} da
+            </div>
+            <div
+              dir="ltr"
+              className={cn(
+                "text-[#00000094] text-sm border border-[#00000059] border-l-0 border-t-0 flex items-center justify-center p-3 min-w-48 w-full",
+                idx !== travel.prices.length - 1 && "border-b-[#D9D9D96B]"
+              )}>
+              {price.child} da
+            </div>
+            <div
+              dir="ltr"
+              className={cn(
+                "text-[#00000094] text-sm border border-[#00000059] border-l-0 border-t-0 flex items-center justify-center p-3 min-w-48 w-full",
+                idx !== travel.prices.length - 1 && "border-b-[#D9D9D96B]"
+              )}>
+              {price.babe} da
+            </div>
+            <div
+              dir="ltr"
+              className={cn(
+                "text-[#00000094] text-sm border border-[#00000059] border-l-0 border-t-0 flex items-center justify-center p-3 min-w-48 w-full",
+                idx !== travel.prices.length - 1 && "border-b-[#D9D9D96B]"
+              )}>
+              {price.food} da
+            </div>
+            <div
+              dir="ltr"
+              className={cn(
+                "border border-[#00000059] border-t-0 flex items-center justify-center p-3  min-w-48 w-full text-[#00000094] text-sm",
+                idx === travel.prices.length - 1 && "rounded-bl-sm",
+                idx !== travel.prices.length - 1 && "border-b-[#D9D9D96B]"
+              )}>
+              {show ? price.commission : "******"} da
             </div>
           </div>
-          <p className="text-[#585757] w-full max-w-2xl">
-            {travel.description}
-          </p>
-          <OpenDialogButton
-            type="manageReservation"
-            title="Reserve"
-            data={{ travel, hotels: travel.hotels }}
+        ))}
+      </div>
+      <div className="overflow-x-auto h-fit overflow-y-hidden flex items-end justify-between gap-20">
+        <div className="flex items-end gap-14 ">
+          <div className="space-y-4">
+            <h1 className="text-xl font-bold">الغرف المحجوزة</h1>
+            <div className="flex items-center gap-16">
+              <div className="space-y-1">
+                <h1 className="text-[#807878]">ثنائية</h1>
+                <h1 className="text-7xl font-medium text-brand">
+                  {travel.reservations
+                    .filter((reservation) => reservation.status !== "CANCELLED")
+                    .reduce(
+                      (acc, reservation) =>
+                        acc +
+                        reservation.reservationRooms.filter(
+                          (room) => room.roomType === "DOUBLE"
+                        ).length,
+                      0
+                    )}
+                </h1>
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-[#807878]">ثلاثية</h1>
+                <h1 className="text-7xl font-medium text-brand">
+                  {travel.reservations
+                    .filter((reservation) => reservation.status !== "CANCELLED")
+                    .reduce(
+                      (acc, reservation) =>
+                        acc +
+                        reservation.reservationRooms.filter(
+                          (room) => room.roomType === "TRIPLE"
+                        ).length,
+                      0
+                    )}
+                </h1>
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-[#807878]">رباعية</h1>
+                <h1 className="text-7xl font-medium text-brand">
+                  {travel.reservations
+                    .filter((reservation) => reservation.status !== "CANCELLED")
+                    .reduce(
+                      (acc, reservation) =>
+                        acc +
+                        reservation.reservationRooms.filter(
+                          (room) => room.roomType === "QUADRUPLE"
+                        ).length,
+                      0
+                    )}
+                </h1>
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-[#807878]">خماسية</h1>
+                <h1 className="text-7xl font-medium text-brand">
+                  {travel.reservations
+                    .filter((reservation) => reservation.status !== "CANCELLED")
+                    .reduce(
+                      (acc, reservation) =>
+                        acc +
+                        reservation.reservationRooms.filter(
+                          (room) => room.roomType === "QUINTUPLE"
+                        ).length,
+                      0
+                    )}
+                </h1>
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-[#807878]">الرجالية</h1>
+                <h1 className="text-7xl font-medium text-brand">{manRooms}</h1>
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-[#807878]">النسائية</h1>
+                <h1 className="text-7xl font-medium text-brand">
+                  {womanRooms}
+                </h1>
+              </div>
+            </div>
+          </div>
+          <Separator
+            orientation="vertical"
+            className="w-0.5 min-w-0.5 min-h-20 h-20 bg-[#D9D9D97A]"
           />
+          <div className="space-y-4">
+            <h1 className="text-xl font-bold">الاماكن الشاغرة</h1>
+            <div className="flex items-center gap-16">
+              <HoverCard>
+                <HoverCardTrigger>
+                  <div className="space-y-1 cursor-pointer">
+                    <h1 className="text-[#807878]">رجال</h1>
+                    <h1
+                      className={cn(
+                        "text-7xl font-medium",
+                        manEmptyPlaces > 0 ? "text-[#F71D1D]" : "text-[#15C847]"
+                      )}>
+                      {manEmptyPlaces}
+                    </h1>
+                  </div>
+                </HoverCardTrigger>
+                <HoverCardContent className="p-3 w-fit">
+                  <div className="space-y-3">
+                    {manHotels.map((hotel) => (
+                      <div className="flex items-center gap-4 w-full justify-between">
+                        <h1 className="font-semibold text-sm">
+                          {hotel.emptyPlaces}
+                        </h1>
+                        <span className="text-[#8C8C8C] text-sm text-right">
+                          {hotel.hotel.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <div className="space-y-1 cursor-pointer">
+                    <h1 className="text-[#807878]">نساء</h1>
+                    <h1
+                      className={cn(
+                        "text-7xl font-medium",
+                        womanEmptyPlaces > 0
+                          ? "text-[#F71D1D]"
+                          : "text-[#15C847]"
+                      )}>
+                      {womanEmptyPlaces}
+                    </h1>
+                  </div>
+                </HoverCardTrigger>
+                <HoverCardContent className="p-3 w-fit">
+                  <div className="space-y-3">
+                    {womanHotels.map((hotel) => (
+                      <div className="flex items-center gap-4 w-full justify-between">
+                        <h1 className="font-semibold text-sm">
+                          {hotel.emptyPlaces}
+                        </h1>
+                        <span className="text-[#8C8C8C] text-sm text-right">
+                          {hotel.hotel.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+            </div>
+          </div>
         </div>
-        <div>
-          <div className="grid grid-cols-2">
-            <div className="border border-[#00000059] flex items-center justify-center p-3 rounded-tl-sm">
-              <h1 className="text-[#00000094] text-sm">Chamber</h1>
-            </div>
-            <div className="border border-[#00000059] flex items-center justify-center p-3 rounded-tr-sm">
-              <h1 className="text-[#00000094] text-sm">Prix</h1>
-            </div>
-          </div>
-          <div className="grid grid-cols-2">
-            <div className="border border-b-[#D9D9D96B] border-[#00000059] flex items-center justify-center p-3 ">
-              <h1 className="text-[#00000094] text-sm text-left">
-                2 - double{" "}
-              </h1>
-            </div>
-            <div className="border border-b-[#D9D9D96B] border-[#00000059] flex items-center justify-center p-3">
-              <h1 className="text-[#00000094] text-sm">{travel.double} DA</h1>
-            </div>
-          </div>
-          <div className="grid grid-cols-2">
-            <div className="border border-b-[#D9D9D96B] border-[#00000059] flex items-center justify-center p-3 ">
-              <h1 className="text-[#00000094] text-sm text-left">3 - Trible</h1>
-            </div>
-            <div className="border border-b-[#D9D9D96B] border-[#00000059] flex items-center justify-center p-3">
-              <h1 className="text-[#00000094] text-sm">{travel.triple} DA</h1>
-            </div>
-          </div>
-          <div className="grid grid-cols-2">
-            <div className="border border-b-[#D9D9D96B] border-[#00000059] flex items-center justify-center p-3 ">
-              <h1 className="text-[#00000094] text-sm text-left">
-                4 - quadruple
-              </h1>
-            </div>
-            <div className="border border-b-[#D9D9D96B] border-[#00000059] flex items-center justify-center p-3">
-              <h1 className="text-[#00000094] text-sm">
-                {travel.quadruple} DA
-              </h1>
-            </div>
-          </div>
-          <div className="grid grid-cols-2">
-            <div className="border border-[#00000059] flex items-center justify-center p-3 rounded-bl-sm">
-              <h1 className="text-[#00000094] text-sm">5 - quintuple</h1>
-            </div>
-            <div className="border border-[#00000059] flex items-center justify-center p-3 rounded-br-sm">
-              <h1 className="text-[#00000094] text-sm">
-                {travel.quintuple} DA
-              </h1>
-            </div>
-          </div>
-        </div>
+        {user?.role === "ADMIN" && (
+          <MultipleHotelPDFs reservations={reservations} travel={travel} />
+        )}
       </div>
     </div>
   );

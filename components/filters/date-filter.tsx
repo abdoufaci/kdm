@@ -104,6 +104,14 @@ export function DateFilter({ url: pathname, searchParams }: Props) {
                         "w-full max-w-[240px] pl-3 text-left font-normal",
                         !field.value && "text-muted-foreground"
                       )}>
+                      <CalendarIcon
+                        className={cn(
+                          "ml-auto h-4 w-4 opacity-50 ",
+                          field.value?.from || field.value?.to
+                            ? "text-black"
+                            : "text-[#64748B]"
+                        )}
+                      />
                       {field.value?.from ? (
                         field.value.to ? (
                           <>
@@ -115,17 +123,9 @@ export function DateFilter({ url: pathname, searchParams }: Props) {
                         )
                       ) : (
                         <span className="text-[#64748B] font-medium">
-                          Date de creation
+                          تاريخ الحجز
                         </span>
                       )}
-                      <CalendarIcon
-                        className={cn(
-                          "ml-auto h-4 w-4 opacity-50 ",
-                          field.value?.from || field.value?.to
-                            ? "text-black"
-                            : "text-[#64748B]"
-                        )}
-                      />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
@@ -142,7 +142,7 @@ export function DateFilter({ url: pathname, searchParams }: Props) {
                       size={"sm"}
                       className="w-full"
                       onClick={handleReset}>
-                      Reset
+                      اعادة ضبط
                     </Button>
                   </div>
                 </PopoverContent>

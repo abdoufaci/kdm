@@ -1,25 +1,29 @@
 export const adminNavigations = [
   {
-    title: "Les Agence",
+    title: "الوكلات",
     href: "/admin/agencies",
   },
   {
-    title: "Umrah Réservation",
+    title: "حجز العمرة",
     href: "/travels",
   },
   {
-    title: "Reservations",
+    title: "الحجزات",
     href: "/reservations",
+  },
+  {
+    title: "الدفع",
+    href: "/admin/payments",
   },
 ];
 
 export const clientNavigations = [
   {
-    title: "Umrah Réservation",
+    title: "حجز العمرة",
     href: "/travels",
   },
   {
-    title: "Reservations",
+    title: "حجزاتك",
     href: "/reservations",
   },
 ];

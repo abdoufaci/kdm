@@ -106,14 +106,16 @@ export function LoginForm() {
                   control={form.control}
                   name="username"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[#A4A4A4]">Username</FormLabel>
+                    <FormItem className="w-full">
+                      <FormLabel className="text-[#A4A4A4] flex justify-end text-right w-full">
+                        اسم المستخدم
+                      </FormLabel>
                       <FormControl>
                         <Input
                           className="auth-input placeholder:text-white/50 text-white border-none"
                           {...field}
                           disabled={isPending}
-                          placeholder="Username"
+                          placeholder="اسم المستخدم"
                         />
                       </FormControl>
                       <FormMessage />
@@ -125,7 +127,9 @@ export function LoginForm() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#A4A4A4]">Password</FormLabel>
+                      <FormLabel className="text-[#A4A4A4] flex justify-end text-right">
+                        كلمة المرور
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -140,7 +144,7 @@ export function LoginForm() {
                         variant={"link"}
                         asChild
                         className="px-0 font-normal text-[#A4A4A4] flex justify-end">
-                        <Link href={"/auth/reset"}>Forgot password ?</Link>
+                        <Link href={"/auth/reset"}>نسيت كلمة المرور ؟</Link>
                       </Button>
                       <FormMessage />
                     </FormItem>
@@ -156,7 +160,7 @@ export function LoginForm() {
             variant={"brand"}
             disabled={isPending}
             className="w-full">
-            {showTwoFactor ? "Confirm" : "Login"}
+            {showTwoFactor ? "Confirm" : "تسجيل دخول"}
           </Button>
         </form>
       </Form>

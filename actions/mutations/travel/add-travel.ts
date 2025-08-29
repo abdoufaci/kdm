@@ -18,9 +18,15 @@ export const addTravel = async (
   const uid = new ShortUniqueId({ length: 10 });
 
   const ref = uid.rnd();
-
-  const meccahMadinaDays = `${data.madinaDays} madina - ${data.meccahDays} meccah`;
-  const { meccahDays, madinaDays, madinaHotels, meccahHotels, ...rest } = data;
+  const meccahMadinaDays = `${data.madinaDays} مدينة - ${data.meccahDays} مكة`;
+  const {
+    meccahDays,
+    madinaDays,
+    madinaHotels,
+    meccahHotels,
+    prices,
+    ...rest
+  } = data;
   const restData = rest;
 
   const hotels = [
@@ -36,6 +42,11 @@ export const addTravel = async (
       ref,
       hotels: {
         connect: hotels,
+      },
+      prices: {
+        createMany: {
+          data: prices.map(({ id, ...price }) => price),
+        },
       },
     },
   });

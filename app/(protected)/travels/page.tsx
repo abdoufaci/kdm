@@ -32,30 +32,30 @@ async function TravelsPage({
   return (
     <div className="py-10 space-y-5">
       <div className="flex flex-col md:!flex-row items-start justify-between gap-5">
-        <div className="flex flex-col sm:!flex-row items-start gap-5 w-full">
-          <SearchFilter url="/travels" searchParams={await searchParams} />
-          {user?.role === "ADMIN" && (
-            <OpenDialogButton
-              title="Ajouter une Umrah"
-              type="manageTravel"
-              data={{ hotels }}
-            />
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-5">
-          <DurationsFilter
+        <div className="flex flex-wrap items-center  gap-5 w-full">
+          <DistributionsFilter
             searchParams={await searchParams}
-            durations={durations}
+            distributions={distributions}
           />
           <DepartDatesFilter
             url="/travels"
             searchParams={await searchParams}
             departs={departDates}
           />
-          <DistributionsFilter
+          <DurationsFilter
             searchParams={await searchParams}
-            distributions={distributions}
+            durations={durations}
           />
+        </div>{" "}
+        <div className="flex flex-col sm:!flex-row items-start justify-end gap-5 w-full">
+          {user?.role === "ADMIN" && (
+            <OpenDialogButton
+              title="اضافة رحلة عمرة"
+              type="manageTravel"
+              data={{ hotels }}
+            />
+          )}
+          <SearchFilter url="/travels" searchParams={await searchParams} />
         </div>
       </div>
       <TravelsDashboard

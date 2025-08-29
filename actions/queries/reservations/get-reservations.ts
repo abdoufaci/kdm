@@ -1,6 +1,7 @@
 import { currentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ExtendedUser } from "@/types/next-auth";
+import { ReservationPaymentStatus, ReservationStatus } from "@prisma/client";
 
 export const getReservations = async ({
   travelId,
@@ -18,7 +19,8 @@ export const getReservations = async ({
   let DateFrom: Date | null = null;
   let DateTo: Date | null = null;
 
-  const { dateFrom, dateTo, agency, search, date } = await searchParams;
+  const { dateFrom, dateTo, agency, search, date, status, paymentStatus } =
+    await searchParams;
 
   if (dateFrom) {
     DateFrom = new Date(dateFrom);
@@ -42,6 +44,12 @@ export const getReservations = async ({
 
   return await db.reservation.findMany({
     where: {
+      ...(status && {
+        status: status as ReservationStatus,
+      }),
+      ...(paymentStatus && {
+        paymentStatus: paymentStatus as ReservationPaymentStatus,
+      }),
       ...(search && {
         OR: [
           {
@@ -67,37 +75,29 @@ export const getReservations = async ({
             },
           },
           {
-            meccahHotel: {
-              name: {
-                contains: search,
-                mode: "insensitive",
-              },
-            },
-          },
-          {
-            madinaHotel: {
-              name: {
-                contains: search,
-                mode: "insensitive",
-              },
-            },
-          },
-          {
-            reservationMembers: {
+            reservationRooms: {
               some: {
-                name: {
-                  contains: search,
-                  mode: "insensitive",
+                reservationMembers: {
+                  some: {
+                    name: {
+                      contains: search,
+                      mode: "insensitive",
+                    },
+                  },
                 },
               },
             },
           },
           {
-            reservationMembers: {
+            reservationRooms: {
               some: {
-                passportNumber: {
-                  contains: search,
-                  mode: "insensitive",
+                reservationMembers: {
+                  some: {
+                    passportNumber: {
+                      contains: search,
+                      mode: "insensitive",
+                    },
+                  },
                 },
               },
             },
@@ -130,15 +130,46 @@ export const getReservations = async ({
       }),
     },
     include: {
-      reservationMembers: true,
       ...(user?.role === "ADMIN" && {
-        user: true,
+        history: {
+          include: {
+            user: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
       }),
-      travel: {
-        include: { hotels: true },
+      payments: true,
+      reservationRooms: {
+        include: {
+          reservationMembers: true,
+          madinaHotel: true,
+          meccahHotel: true,
+        },
       },
-      madinaHotel: true,
-      meccahHotel: true,
+      user: true,
+      travel: {
+        include: {
+          reservations: {
+            include: {
+              reservationRooms: {
+                include: {
+                  reservationMembers: true,
+                  madinaHotel: true,
+                  meccahHotel: true,
+                },
+              },
+            },
+          },
+          hotels: true,
+          prices: {
+            include: {
+              hotel: true,
+            },
+          },
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",

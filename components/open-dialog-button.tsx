@@ -16,7 +16,7 @@ export function OpenDialogButton({ data = {}, type, title }: Props) {
     <Button
       onClick={() => onOpen(type, data)}
       variant={"brand"}
-      className="text-white/90">
+      className="text-white/90 px-8">
       {title}
     </Button>
   );

@@ -78,15 +78,15 @@ export function SetAgencyPasswordForm() {
                     value={field.value ?? ""}
                     onChange={field.onChange}
                     id="password"
-                    className="w-full text-xs rounded-lg border border-[#CFCFCF] px-4 pb-2.5 pt-6 pr-20 focus:outline-none focus:ring-0 h-14"
+                    className="w-full text-xs rounded-lg border border-[#CFCFCF] px-4 pb-2.5 pt-6 pl-20 focus:outline-none focus:ring-0 h-14"
                     placeholder="••••••••"
                   />
                   <FormLabel
                     htmlFor="password"
-                    className="absolute top-2 left-4 text-[9px]">
-                    Password
+                    className="absolute top-2 right-4 text-[9px]">
+                    كلمة المرور الجديدة
                   </FormLabel>
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <div className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     <Button
                       type="button"
                       variant="ghost"
@@ -125,7 +125,7 @@ export function SetAgencyPasswordForm() {
           variant={"brand"}
           size={"lg"}
           className="h-11 w-full">
-          Confirm
+          تأكيد
         </Button>
       </form>
     </Form>

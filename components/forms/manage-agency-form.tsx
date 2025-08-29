@@ -196,7 +196,7 @@ export function ManageAgencyForm() {
             variant={"blackOutline"}
             size={"sm"}
             className="text-xs">
-            Set Password
+            كلمة مرور جديدة
           </Button>
         </div>
         <div className="space-y-4 w-full">
@@ -212,13 +212,13 @@ export function ManageAgencyForm() {
                       id="slogan"
                       className="w-full text-xs rounded-lg border border-[#CFCFCF] px-4 pb-2.5 pt-6 focus:outline-none 
                     focus:ring-0 h-14"
-                      placeholder="Nom de l’agence"
+                      placeholder="اسم خاص بوكالة"
                       {...field}
                     />
                     <FormLabel
                       htmlFor="slogan"
-                      className="absolute top-2 left-4 text-[9px]">
-                      Nom
+                      className="absolute top-2 right-4 text-[9px]">
+                      الاسم
                     </FormLabel>
                   </div>
                 </FormControl>
@@ -238,13 +238,13 @@ export function ManageAgencyForm() {
                       id="slogan"
                       className="w-full text-xs rounded-lg border border-[#CFCFCF] px-4 pb-2.5 pt-6 focus:outline-none 
                     focus:ring-0 h-14"
-                      placeholder="xxx@gmail.com"
+                      placeholder="********@GMAIL.COM"
                       {...field}
                     />
                     <FormLabel
                       htmlFor="slogan"
-                      className="absolute top-2 left-4 text-[9px]">
-                      Email
+                      className="absolute top-2 right-4 text-[9px]">
+                      بريد الالكتروني
                     </FormLabel>
                   </div>
                 </FormControl>
@@ -265,12 +265,12 @@ export function ManageAgencyForm() {
                       id="slogan"
                       className="w-full text-xs rounded-lg border border-[#CFCFCF] px-4 pb-2.5 pt-6 focus:outline-none 
                     focus:ring-0 h-14"
-                      placeholder="telephone"
+                      placeholder="0*************"
                     />
                     <FormLabel
                       htmlFor="slogan"
-                      className="absolute top-2 left-4 text-[9px]">
-                      Telephone
+                      className="absolute top-2 right-4 text-[9px]">
+                      الهاتف
                     </FormLabel>
                   </div>
                 </FormControl>
@@ -289,12 +289,12 @@ export function ManageAgencyForm() {
                       {...field}
                       className="w-full text-xs rounded-lg border border-[#CFCFCF] px-4 pb-2.5 pt-6 focus:outline-none 
                     focus:ring-0 h-14"
-                      placeholder="address"
+                      placeholder="العنوان"
                     />
                     <FormLabel
                       htmlFor="slogan"
-                      className="absolute top-2 left-4 text-[9px]">
-                      Adresse
+                      className="absolute top-2 right-4 text-[9px]">
+                      العنوان
                     </FormLabel>
                   </div>
                 </FormControl>
@@ -323,19 +323,19 @@ export function ManageAgencyForm() {
                               ? "border-red-600"
                               : "border-[#CFCFCF]"
                         )}
-                        placeholder="username"
+                        placeholder="اسم المستخدم"
                       />
                       <FormLabel
                         htmlFor="username"
                         className={cn(
-                          "absolute top-2 left-4 text-[9px]",
+                          "absolute top-2 right-4 text-[9px]",
                           availabilityStatus === "available"
                             ? "text-green-600"
                             : availabilityStatus === "taken" && "text-red-600"
                         )}>
-                        Username
+                        اسم المستخدم
                       </FormLabel>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2">
                         {getStatusIcon()}
                       </div>
                     </div>
@@ -354,16 +354,16 @@ export function ManageAgencyForm() {
                       <Input
                         type={showPassword ? "text" : "password"}
                         id="password"
-                        className="w-full text-xs rounded-lg border border-[#CFCFCF] px-4 pb-2.5 pt-6 pr-20 focus:outline-none focus:ring-0 h-14"
+                        className="w-full text-xs rounded-lg border border-[#CFCFCF] px-4 pb-2.5 pt-6 pl-20 focus:outline-none focus:ring-0 h-14"
                         placeholder="••••••••"
                         {...field}
                       />
                       <FormLabel
                         htmlFor="password"
-                        className="absolute top-2 left-4 text-[9px]">
-                        Password
+                        className="absolute top-2 right-4 text-[9px]">
+                        كلمة المرور
                       </FormLabel>
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                      <div className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                         <Button
                           type="button"
                           variant="ghost"
@@ -407,7 +407,7 @@ export function ManageAgencyForm() {
             variant={"brand"}
             size={"lg"}
             className="h-11 w-full">
-            Ajouter
+            اظافة
           </Button>
         ) : (
           <div className="grid grid-cols-1 md:!grid-cols-2 place-items-center gap-5 w-full">
@@ -417,7 +417,7 @@ export function ManageAgencyForm() {
               variant={"brand"}
               size={"lg"}
               className="h-11 w-full">
-              Edit
+              تغيير
             </Button>
             <Button
               disabled={isPending}
@@ -426,7 +426,7 @@ export function ManageAgencyForm() {
               variant={"delete"}
               size={"lg"}
               className="h-11 w-full">
-              Delete
+              حذف
             </Button>
           </div>
         )}
